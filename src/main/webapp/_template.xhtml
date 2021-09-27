@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head />
+<h:body>
+	<div id="cabecalho">
+		<h:panelGrid columns="2">
+			<h:graphicImage library="img" name="library-logo.png" width="360" height="230"/>
+		</h:panelGrid>
+
+		<p:growl id="messages" showDetail="true" autoUpdate="true" />
+
+		<h:form rendered="#{usuarioLogado != null}">
+			<p:menuButton value="Menu">
+				<p:menuitem value="Livros" action="book?faces-redirect=true"
+					icon="fa fa-fw fa-pencil-square-o" />
+				<p:menuitem value="Autores" action="author?faces-redirect=true"
+					icon="fa fa-fw- fa-pencil-square-o" />
+				<p:menuitem value="Vendas" action="sales?faces-redirect=true"
+					icon="fa fa-fw fa-bar-chart" />
+				<p:separator />
+				<p:menuitem value="Logout" action="#{loginBean.logout}"
+					icon="fa fa-fw fa-sign-out" />
+			</p:menuButton>
+		</h:form>
+
+		<h1>
+			<ui:insert name="titulo"></ui:insert>
+		</h1>
+	</div>
+
+	<div id="conteudo">
+		<ui:insert name="conteudo">
+		</ui:insert>
+	</div>
+</h:body>
+
+</html>

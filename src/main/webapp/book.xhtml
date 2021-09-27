@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ui:composition template="_template.xhtml">
+	
+		<f:metadata>
+			<f:viewParam name="bookIsbn" value="#{bookBean.book.isbn}" />
+			<f:viewAction action="#{bookBean.loadBooksById}" if="#{param.bookIsbn != null}" />
+		</f:metadata>
+	
+
+		<ui:define name="titulo">
+				<p:outputPanel>Novo Livro</p:outputPanel>
+		</ui:define>
+
+		<ui:define name="conteudo">
+			<h:form id="formLivro">
+
+				<p:messages id="messages" />
+
+				<p:fieldset legend="Dados do Livro">
+					<p:panelGrid columns="2">
+
+						<p:outputLabel value="Titulo:" for="titulo" />
+						<p:inputText id="titulo" value="#{bookBean.book.title}"
+							required="true" requiredMessage="Título obrigatório"
+							validatorMessage="Título não pode ser superior a 40">
+							<f:validateLength maximum="40" />
+							<f:ajax event="blur" render="messages" />
+						</p:inputText>
+						
+						<p:outputLabel value="Editora:" for="editora" />
+						<p:inputText id="editora" value="#{bookBean.book.publisher}"
+							required="true" requiredMessage="Editora obrigatória"
+							validatorMessage="Editora não pode menor que 3 caracteres">
+							<f:validateLength minimum="3" />
+							<f:ajax event="blur" render="messages" />
+						</p:inputText>
+						
+						<p:outputLabel value="ISBN:" for="isbn" />
+						<p:inputMask id="isbn" value="#{bookBean.book.isbn}" 
+							validator="#{bookBean.startsWithDigitOne}" mask="999-9-99-999999-9"/>
+
+						<p:outputLabel value="Preço:" for="preco" />
+						<p:inputText id="preco" value="#{bookBean.book.price}" />
+
+						<p:outputLabel value="Data de Lançamento:" for="dataLancamento" />
+						<p:calendar id="dataLancamento" value="#{bookBean.book.publishDate.time}" timeZone="America/Sao_Paulo" pattern="dd/MM/yyyy" mask="true" />
+						
+					</p:panelGrid>
+
+				</p:fieldset>
+	
+				<p:fieldset legend="Dados do Autor">
+
+					<p:panelGrid columns="4">
+						<p:outputLabel value="Selecione Autor:" for="author" />
+						<p:selectOneMenu value="#{bookBean.authorId}" id="author">
+							<f:selectItems value="#{bookBean.authors}" var="author" itemLabel="#{author.name}" itemValue="#{author.id}" />
+						</p:selectOneMenu>
+						<p:commandButton value="Gravar Autor" action="#{bookBean.insertAuthor}" 
+								process="@this author" update="tabelaAutores">
+						</p:commandButton>
+		
+						<p:commandLink value="ou cadastrar novo autor" action="#{bookBean.formAuthor}" immediate="true" 
+									update="@all"/>
+					</p:panelGrid>
+					
+					<p:dataTable value="#{bookBean.booksAuthors}" var="author" id="tabelaAutores" emptyMessage="Nenhum autor">
+						<p:column>
+							<h:outputText value="#{author.name}" />
+						</p:column>
+						<p:column>
+							<p:commandLink value="X" action="#{bookBean.removeBookAuthor(author)}" update="tabelaAutores" process="@this"/>
+						</p:column>
+					</p:dataTable>
+				</p:fieldset>
+					<br />
+				<p:fieldset style="text-align:center;">
+					<p:commandButton value="Gravar Livro" action="#{bookBean.save}" process="@form" 
+							update="@form :formTabelaLivros:tabelaLivros"  />
+				</p:fieldset>
+			</h:form>
+			
+			<br />
+			<br />
+	
+			<h:form id="formTabelaLivros">
+			<p:dataTable value="#{bookBean.books}" var="book" id="tabelaLivros" paginator="true" rows="5">
+				<f:facet name="header">Livros</f:facet>
+				<p:column headerText="Título" sortBy="#{book.title}" filterBy="#{book.title}" filterMatchMode="startsWith">
+					<h:outputText value="#{book.title}" />
+				</p:column>
+					<p:column headerText="Editora" sortBy="#{book.publisher}" filterBy="#{book.publisher}" filterMatchMode="startsWith">
+					<h:outputText value="#{book.publisher}" />
+				</p:column>
+				<p:column headerText="ISBN" sortBy="#{book.isbn}" >
+					<h:outputText value="#{book.isbn}" />
+				</p:column>
+				<p:column headerText="Preço"  sortBy="#{book.price}">
+					<h:outputText value="#{book.price}">
+						<f:convertNumber type="currency" pattern="R$ #0.00"
+							currencySymbol="R$" locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Data" sortBy="#{book.publishDate.time}">
+					<h:outputText value="#{book.publishDate.time}">
+						<f:convertDateTime pattern="dd/MM/yyyy"
+							timeZone="America/Sao_Paulo" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Alterar">
+					<p:commandButton update=":formLivro" process="@this" value="alterar" actionListener="#{bookBean.load(book)}" icon="fa fa-fw fa-edit" />
+				</p:column>					
+				
+				<p:column headerText="Remover">
+					<p:commandButton update="@form" process="@this" value="remover" actionListener="#{bookBean.remove(book)}" icon="fa fa-fw fa-remove" />
+				</p:column>	
+			</p:dataTable>
+			</h:form>			
+		</ui:define>
+	</ui:composition>
+
+</html>
